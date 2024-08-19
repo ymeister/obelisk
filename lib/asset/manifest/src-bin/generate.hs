@@ -9,7 +9,7 @@ main = do
   --TODO: Usage
   [root, haskellTarget, packageName, moduleName, fileTarget] <- getArgs
   paths <- gatherHashedPaths root
-  writeStaticProject paths haskellTarget $ StaticConfig
+  writeStaticProject paths haskellTarget fileTarget $ StaticConfig
     { _staticConfig_packageName = T.pack packageName
     , _staticConfig_moduleName = T.pack moduleName
     }

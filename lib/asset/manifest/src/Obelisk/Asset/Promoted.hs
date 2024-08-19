@@ -30,10 +30,10 @@ data StaticConfig = StaticConfig
   , _staticConfig_moduleName :: Text --TODO: Better type
   }
 
-writeStaticProject :: Map FilePath FilePath -> FilePath -> StaticConfig -> IO ()
-writeStaticProject paths target cfg = do
+writeStaticProject :: Map FilePath FilePath -> FilePath -> FilePath -> StaticConfig -> IO ()
+writeStaticProject paths target output cfg = do
   let modName = _staticConfig_moduleName cfg
-  modContents <- staticModuleFile modName paths
+  modContents <- staticModuleFile output modName paths
   writeCabalProject target $ SimplePkg
     { _simplePkg_name = _staticConfig_packageName cfg
     , _simplePkg_moduleName = _staticConfig_moduleName cfg
@@ -41,8 +41,8 @@ writeStaticProject paths target cfg = do
     , _simplePkg_dependencies = ["base", "ghc-prim", "text"]
     }
 
-staticModuleFile :: Text -> Map FilePath FilePath -> IO Text
-staticModuleFile moduleName paths = do
+staticModuleFile :: FilePath -> Text -> Map FilePath FilePath -> IO Text
+staticModuleFile output moduleName paths = do
   decs <- runQ $ fmap toList $ execWriterT $ staticClassWithInstances paths
   return $ T.unlines
     [ "{-# LANGUAGE AllowAmbiguousTypes #-}"
@@ -52,7 +52,8 @@ staticModuleFile moduleName paths = do
     , "{-# LANGUAGE OverloadedStrings #-}"
     , "{-# LANGUAGE ScopedTypeVariables #-}"
     , "{-# LANGUAGE TypeApplications #-}"
-    , "module " <> moduleName <> " {-# DEPRECATED \"Generate this module with the 'obelisk-asset-th-generate' executable instead.\" #-} where"
+    , ""
+    , "module " <> moduleName <> " where"
     , ""
     , "import qualified GHC.Types"
     , "import Data.Text (Text)"
@@ -60,7 +61,7 @@ staticModuleFile moduleName paths = do
     , "import Data.Monoid ((<>))"
     , ""
     , "static :: forall a. StaticFile a => Text"
-    , "static = \"static/\" <> hashedPath @a" --TODO: Use obelisk-route to generate this in a more consistent way
+    , "static = \"" <> T.pack output <> "/\" <> hashedPath @a" --TODO: Use obelisk-route to generate this in a more consistent way
     , ""
     , T.pack $ pprint decs
     ]
