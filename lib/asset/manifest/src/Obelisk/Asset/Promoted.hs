@@ -52,7 +52,7 @@ staticModuleFile moduleName paths = do
     , "{-# LANGUAGE OverloadedStrings #-}"
     , "{-# LANGUAGE ScopedTypeVariables #-}"
     , "{-# LANGUAGE TypeApplications #-}"
-    , "module " <> moduleName <> " {-# DEPRECATED \"Generate this module with the 'obelisk-asset-th-generate' executable instead.\" #-} where"
+    , "module " <> moduleName <> " where"
     , ""
     , "import qualified GHC.Types"
     , "import Data.Text (Text)"

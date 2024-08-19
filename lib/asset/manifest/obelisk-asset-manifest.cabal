@@ -30,6 +30,7 @@ library
     , vector
   exposed-modules:
     Obelisk.Asset.Cabal
+    Obelisk.Asset.Copy
     Obelisk.Asset.Gather
     Obelisk.Asset.Promoted
     Obelisk.Asset.Symlink
