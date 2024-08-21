@@ -50,6 +50,7 @@ executable obelisk-asset-manifest-generate
   main-is: generate.hs
   build-depends:
       base
+    , containers
     , obelisk-asset-manifest
     , text
 

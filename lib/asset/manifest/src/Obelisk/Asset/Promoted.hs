@@ -60,7 +60,7 @@ staticModuleFile moduleName paths = do
     , "import Data.Monoid ((<>))"
     , ""
     , "static :: forall a. StaticFile a => Text"
-    , "static = \"static/\" <> hashedPath @a" --TODO: Use obelisk-route to generate this in a more consistent way
+    , "static = \"static/\" <> staticPath @a" --TODO: Use obelisk-route to generate this in a more consistent way
     , ""
     , T.pack $ pprint decs
     ]
@@ -89,7 +89,7 @@ staticClass :: WriterT (Seq Dec) Q StaticContext
 staticClass = do
   let n x = Name (OccName x) NameS
       className = n "StaticFile"
-      methodName = n "hashedPath"
+      methodName = n "staticPath"
       cls = ClassD [] className [kindedTVFlag (n "s") BndrReq (ConT ''Symbol)] [] [SigD methodName (ConT ''Text)]
   tell $ Seq.singleton cls
   return $ StaticContext
@@ -98,7 +98,7 @@ staticClass = do
     }
 
 staticInstance :: StaticContext -> FilePath -> FilePath -> WriterT (Seq Dec) Q ()
-staticInstance ctx relativePath hashedPath = do
+staticInstance ctx relativePath staticPath = do
   let headType = ConT (_staticContext_className ctx) `AppT` LitT (StrTyLit relativePath)
-      methodDec = ValD (VarP $ _staticContext_methodName ctx) (NormalB (LitE (StringL hashedPath))) []
+      methodDec = ValD (VarP $ _staticContext_methodName ctx) (NormalB (LitE (StringL staticPath))) []
   tell $ Seq.singleton $ InstanceD Nothing [] headType [methodDec]
